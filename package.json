@@ -1,0 +1,17 @@
+{
+  "name": "sieacher",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp run -r --parallel dev",
+    "test": "vp run -r test",
+    "check": "vp check"
+  },
+  "devDependencies": {
+    "vite-plus": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

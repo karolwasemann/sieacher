@@ -23,4 +23,3 @@ Help users get better at speaking and writing a foreign language through regular
 2. **Voice later**: the user practises by speaking. The app records their voice and the tutor replies.
 
 ## Open topics
-

@@ -1,0 +1,15 @@
+{
+  "name": "@sieacher/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.ts",
+    "test": "vp test run --passWithNoTests"
+  },
+  "dependencies": {
+    "@sieacher/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2"
+  }
+}
