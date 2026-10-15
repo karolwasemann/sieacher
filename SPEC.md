@@ -24,4 +24,3 @@ Help users get better at speaking and writing a foreign language through regular
 
 ## Open topics
 
-Everything else (session flow, corrections, memory, technical stack, milestones) will be decided in separate discussions.
