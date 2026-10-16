@@ -9,7 +9,6 @@ Living document. Updated as decisions are made. Terms are defined in [GLOSSARY.m
 | 1   | Language: TypeScript                                                                                                                |                                                           |
 | 2   | Single Learner, no accounts                                                                                                         | Design so users can be added later                        |
 | 3   | Web app                                                                                                                             | Browser mic recording needed for voice phase              |
-| 4   | Model-agnostic; Anthropic models first                                                                                              | API key in `.env`                                         |
 | 5   | Tutor gives Corrections alongside its reply, explained in Polish                                                                    |                                                           |
 | 6   | Separate backend server and frontend app                                                                                            | Separation of concerns                                    |
 | 7   | Anthropic models only; model id set in `.env` (e.g. Haiku)                                                                          | Our own thin wrapper over `@anthropic-ai/sdk`             |
@@ -31,7 +30,7 @@ Living document. Updated as decisions are made. Terms are defined in [GLOSSARY.m
 | 23  | Database access: Drizzle ORM                                                                                                        | Typed, SQL-like, no decorators (unlike TypeORM)           |
 | 24  | Server owns Conversation state behind a `ConversationStore` interface (in-memory in M1, SQLite from M3)                             | API shape stays stable across milestones                  |
 | 25  | Full history to the model in M1–M2; from M5, last N Messages + a summary (Topic tags, most frequent Mistakes)                       | Measure tokens first                                      |
-| 26  | Mistake categories are a fixed list per Target language in `shared/`, enforced by the JSON schema                                   | Each category has a Polish label                          |
+| 26  | Mistake categories are a fixed list per Target language in `shared/`, enforced by the JSON schema                                   | Keys only; Polish labels live in `web/` i18n              |
 | 27  | Level is fixed for a Conversation; changing Level means starting a new Conversation                                                 |                                                           |
 | 28  | Invalid model JSON: retry once with the validation error, then show a Polish error and let the Learner resend                       |                                                           |
 | 29  | UI strings through react-i18next (Polish only for now)                                                                              | Tutor's Polish explanations come from the model, not i18n |
@@ -51,7 +50,7 @@ The Learner opens the app, picks a Target language (EN/DE) and a Level (A1–C2)
 | ---- | --------------------------------------------------------------------------------------------------------- | ------ |
 | 0    | Install Node 24 (nvm) and pnpm (corepack) in WSL                                                          | done   |
 | 1    | Workspace skeleton: `server/`, `shared/`, base tsconfig, Vite+, one passing test (`web/` moved to step 7) | done   |
-| 2    | `shared/`: zod schemas — Target language, Level, Mistake category, Tutor reply                            | todo   |
+| 2    | `shared/`: zod schemas — Target language, Level, Mistake category, Tutor reply                            | done   |
 | 3    | `server/`: `ChatModel` interface, fake model, Anthropic adapter, `.env` config (key + model id)           | todo   |
 | 4    | `server/`: Lulu's system prompt builder (pure function + tests)                                           | todo   |
 | 5    | `server/`: Tutor reply flow — call → parse → validate → retry once; tested with the fake                  | todo   |
