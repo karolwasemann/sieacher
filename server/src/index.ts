@@ -1,3 +1,3 @@
-import { LEVELS } from '@sieacher/shared';
+import { Level } from '@sieacher/shared';
 
-console.log(`Sieacher server started. Levels: ${LEVELS.join(', ')}`);
+console.log(`Sieacher server started. Levels: ${Level.options.join(', ')}`);

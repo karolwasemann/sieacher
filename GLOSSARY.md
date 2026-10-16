@@ -20,6 +20,8 @@
 
 **Mistake** — a recurring pattern of error in the Learner's language (e.g. "present tense instead of past simple"), as opposed to a single wrong sentence. One Mistake has many Corrections across Conversations.
 
+**Mistake category** — the kind of a Mistake (e.g. "case", "tense"), from a fixed list per Target language. Every Correction has exactly one.
+
 **Check** — a moment where the Tutor deliberately gives the Learner a chance to use the form a Mistake is about. A Check is either passed or failed.
 
 **Learned** — the state of a Mistake after enough passed Checks. A Learned Mistake stops being checked, and becomes un-learned if the Learner makes it again.

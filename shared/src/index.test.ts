@@ -1,8 +1,28 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { LEVELS } from './index.ts';
+import { tutorReplySchema } from './index.ts';
 
-describe('LEVELS', () => {
-  it('lists the six CEFR levels from lowest to highest', () => {
-    expect(LEVELS).toEqual(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+const tutorReplyWith = (category: string) => ({
+  reply: 'Wie war dein Wochenende?',
+  corrections: [
+    {
+      original: 'mit der Hund',
+      corrected: 'mit dem Hund',
+      explanation: 'Po „mit” zawsze celownik.',
+      category,
+    },
+  ],
+});
+
+describe('tutorReplySchema', () => {
+  it('accepts a category from the Target language list', () => {
+    expect(tutorReplySchema('de').safeParse(tutorReplyWith('case')).success).toBe(true);
+  });
+
+  it('accepts an English category for English', () => {
+    expect(tutorReplySchema('en').safeParse(tutorReplyWith('articles')).success).toBe(true);
+  });
+
+  it('rejects a category from the other language', () => {
+    expect(tutorReplySchema('de').safeParse(tutorReplyWith('articles')).success).toBe(false);
   });
 });
