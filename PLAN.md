@@ -51,9 +51,9 @@ The Learner opens the app, picks a Target language (EN/DE) and a Level (A1–C2)
 | 0    | Install Node 24 (nvm) and pnpm (corepack) in WSL                                                          | done   |
 | 1    | Workspace skeleton: `server/`, `shared/`, base tsconfig, Vite+, one passing test (`web/` moved to step 7) | done   |
 | 2    | `shared/`: zod schemas — Target language, Level, Mistake category, Tutor reply                            | done   |
-| 3    | `server/`: `ChatModel` interface, fake model, Anthropic adapter, `.env` config (key + model id)           | todo   |
+| 3    | `server/`: `ChatModel` interface, Anthropic adapter, `.env` config (key + model id)                       | done   |
 | 4    | `server/`: Lulu's system prompt builder (pure function + tests)                                           | todo   |
-| 5    | `server/`: Tutor reply flow — call → parse → validate → retry once; tested with the fake                  | todo   |
+| 5    | `server/`: Tutor reply flow — call → parse → validate → retry once; fake model, tested with it            | todo   |
 | 6    | `server/`: in-memory `ConversationStore` + Hono routes, listening on `127.0.0.1`                          | todo   |
 | 7    | `web/`: Vite + React + Tailwind + react-i18next, Target language & Level picker                           | todo   |
 | 8    | `web/`: chat screen with Corrections and error state                                                      | todo   |

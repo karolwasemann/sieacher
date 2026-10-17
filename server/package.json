@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/index.ts",
+    "dev": "node --env-file-if-exists=.env --watch src/index.ts",
     "test": "vp test run --passWithNoTests"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
     "@sieacher/shared": "workspace:*"
   },
   "devDependencies": {
