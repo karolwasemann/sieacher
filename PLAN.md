@@ -53,7 +53,7 @@ The Learner opens the app, picks a Target language (EN/DE) and a Level (A1–C2)
 | 2    | `shared/`: zod schemas — Target language, Level, Mistake category, Tutor reply                            | done   |
 | 3    | `server/`: `ChatModel` interface, Anthropic adapter, `.env` config (key + model id)                       | done   |
 | 4    | `server/`: Lulu's system prompt builder (pure function + tests)                                           | todo   |
-| 5    | `server/`: Tutor reply flow — call → parse → validate → retry once; fake model, tested with it            | todo   |
+| 5    | `server/`: Tutor reply flow — call → parse → validate → retry once; fake model, tested with it. Also: generate the prompt's output format from the zod schema (`z.toJSONSchema` + `.describe()`) | todo   |
 | 6    | `server/`: in-memory `ConversationStore` + Hono routes, listening on `127.0.0.1`                          | todo   |
 | 7    | `web/`: Vite + React + Tailwind + react-i18next, Target language & Level picker                           | todo   |
 | 8    | `web/`: chat screen with Corrections and error state                                                      | todo   |
