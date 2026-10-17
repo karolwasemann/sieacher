@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { ChatMessage, ChatModel } from './chat-model.ts';
 import { buildSystemPrompt } from './system-prompt.ts';
 
-type TutorReply = z.infer<ReturnType<typeof tutorReplySchema<TargetLanguage>>>;
+export type TutorReply = z.infer<ReturnType<typeof tutorReplySchema<TargetLanguage>>>;
 
 export class InvalidTutorReplyError extends Error {}
 

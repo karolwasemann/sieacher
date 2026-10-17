@@ -42,3 +42,12 @@ export const tutorReplySchema = <L extends TargetLanguage>(targetLanguage: L) =>
     reply: z.string().min(1),
     corrections: z.array(correctionSchema(targetLanguage)),
   });
+
+export const createConversationRequest = z.object({
+  targetLanguage: TargetLanguage,
+  level: Level,
+});
+
+export const sendMessageRequest = z.object({
+  content: z.string().trim().min(1),
+});

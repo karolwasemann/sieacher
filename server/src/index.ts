@@ -1,4 +1,7 @@
+import { serve } from '@hono/node-server';
 import { createAnthropicModel } from './anthropic-model.ts';
+import { createApp } from './app.ts';
+import { createInMemoryStore } from './conversation-store.ts';
 
 const env = (name: string) => {
   const value = process.env[name];
@@ -7,10 +10,11 @@ const env = (name: string) => {
 };
 
 env('ANTHROPIC_API_KEY');
-const model = createAnthropicModel(env('ANTHROPIC_MODEL'));
+const app = createApp({
+  model: createAnthropicModel(env('ANTHROPIC_MODEL')),
+  store: createInMemoryStore(),
+});
 
-// shortcut: one smoke call to prove the adapter works, replaced by Hono routes in step 6
-const reply = await model.complete('You are a friendly German tutor. Answer in one sentence.', [
-  { role: 'user', content: 'Say hi in German.' },
-]);
-console.log(reply);
+serve({ fetch: app.fetch, hostname: '127.0.0.1', port: 3000 }, ({ port }) => {
+  console.log(`Server listening on http://127.0.0.1:${port}`);
+});
