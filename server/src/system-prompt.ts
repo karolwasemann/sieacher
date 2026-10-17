@@ -40,7 +40,7 @@ The learner is at CEFR level ${level}. ${LEVEL_GUIDANCE[level]}
 - Correct only real mistakes, not style preferences.
 - Explain each correction in one short sentence in Polish.
 - Never mention corrections in your reply; they are shown separately.
-- If there are no mistakes, return an empty list.
+- If there are no mistakes, return an empty list. Never add a correction to say a sentence is correct.
 
 # Output format
 Respond with JSON only, no markdown fences and no text around it:

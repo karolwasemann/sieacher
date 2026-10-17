@@ -1,9 +1,9 @@
 import { zValidator } from '@hono/zod-validator';
-import { createConversationRequest, sendMessageRequest } from '@sieacher/shared';
+import { createConversationRequest, sendMessageRequest, type TutorReply } from '@sieacher/shared';
 import { Hono } from 'hono';
 import type { ChatMessage, ChatModel } from './chat-model.ts';
 import type { ConversationStore, Turn } from './conversation-store.ts';
-import { getTutorReply, InvalidTutorReplyError, type TutorReply } from './tutor.ts';
+import { getTutorReply, InvalidTutorReplyError } from './tutor.ts';
 
 // Lulu's past turns go back as full JSON, so the history matches the format the prompt asks for.
 const toModelMessages = (turns: Turn[]): ChatMessage[] =>

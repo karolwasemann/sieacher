@@ -1,9 +1,12 @@
-import { tutorReplySchema, type Level, type TargetLanguage } from '@sieacher/shared';
+import {
+  tutorReplySchema,
+  type Level,
+  type TargetLanguage,
+  type TutorReply,
+} from '@sieacher/shared';
 import { z } from 'zod';
 import type { ChatMessage, ChatModel } from './chat-model.ts';
 import { buildSystemPrompt } from './system-prompt.ts';
-
-export type TutorReply = z.infer<ReturnType<typeof tutorReplySchema<TargetLanguage>>>;
 
 export class InvalidTutorReplyError extends Error {}
 
@@ -19,9 +22,13 @@ const parseTutorReply = (
   }
 
   const result = tutorReplySchema(targetLanguage).safeParse(json);
-  return result.success
-    ? { ok: true, reply: result.data }
-    : { ok: false, error: z.prettifyError(result.error) };
+  if (!result.success) return { ok: false, error: z.prettifyError(result.error) };
+
+  // The model sometimes "corrects" a sentence that is already right; that is noise, not worth a retry.
+  const corrections = result.data.corrections.filter(
+    (c) => c.original.trim() !== c.corrected.trim(),
+  );
+  return { ok: true, reply: { ...result.data, corrections } };
 };
 
 export const getTutorReply = async ({

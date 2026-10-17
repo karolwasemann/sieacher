@@ -1,5 +1,4 @@
-import type { Level, TargetLanguage } from '@sieacher/shared';
-import type { TutorReply } from './tutor.ts';
+import type { Level, TargetLanguage, TutorReply } from '@sieacher/shared';
 
 export type Turn = { learnerMessage: string; tutorReply: TutorReply };
 

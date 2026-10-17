@@ -56,4 +56,19 @@ describe('getTutorReply', () => {
     await expect(ask(model)).rejects.toBeInstanceOf(InvalidTutorReplyError);
     expect(calls).toHaveLength(2);
   });
+
+  it('drops a Correction that changes nothing, without a retry', async () => {
+    const noOp = {
+      original: 'Sie braucht manchmal länger.',
+      corrected: 'Sie braucht manchmal länger.',
+      explanation: 'Dieser Satz ist richtig.',
+      category: 'other',
+    };
+    const { model, calls } = createFakeModel([
+      JSON.stringify({ reply: 'Wie war dein Tag?', corrections: [noOp] }),
+    ]);
+
+    expect((await ask(model)).corrections).toEqual([]);
+    expect(calls).toHaveLength(1);
+  });
 });

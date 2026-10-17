@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
-    "build": "vp build"
+    "build": "vp build",
+    "test": "vp test run"
   },
   "dependencies": {
     "@sieacher/shared": "workspace:*",
