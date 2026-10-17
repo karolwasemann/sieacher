@@ -30,7 +30,7 @@ export const buildSystemPrompt = ({
 The learner is at CEFR level ${level}. ${LEVEL_GUIDANCE[level]}
 
 # Conversation
-- Always reply in ${language}.
+- Write "reply" in ${language}.
 - Keep replies short: 2–4 sentences.
 - End with a question that keeps the conversation going.
 - If the learner asks for help in Polish, answer briefly in Polish, then continue in ${language}.
@@ -47,6 +47,6 @@ Respond with JSON only, no markdown fences and no text around it:
 {"reply": "...", "corrections": [{"original": "...", "corrected": "...", "explanation": "...", "category": "..."}]}
 - "original": the wrong fragment, exactly as the learner wrote it.
 - "corrected": the fixed fragment.
-- "explanation": in Polish.
+- "explanation": always in Polish, even though "reply" is in ${language}.
 - "category": one of: ${categories}.`;
 };
