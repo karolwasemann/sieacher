@@ -13,6 +13,11 @@ export const createAnthropicModel = (model: string): ChatModel => {
         messages,
       });
 
+      const { input_tokens, output_tokens } = response.usage;
+      console.log(
+        `${model} messages=${messages.length} input=${input_tokens} output=${output_tokens}`,
+      );
+
       if (response.stop_reason === 'refusal' || response.stop_reason === 'max_tokens') {
         throw new Error(`Model stopped early: ${response.stop_reason}`);
       }
