@@ -3,6 +3,9 @@ import { z } from 'zod';
 export const TargetLanguage = z.enum(['en', 'de']);
 export type TargetLanguage = z.infer<typeof TargetLanguage>;
 
+export const AppLanguage = z.enum(['pl', 'en', 'de']);
+export type AppLanguage = z.infer<typeof AppLanguage>;
+
 export const Level = z.enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
 export type Level = z.infer<typeof Level>;
 
@@ -44,10 +47,16 @@ export const tutorReplySchema = <L extends TargetLanguage>(targetLanguage: L) =>
   });
 export type TutorReply = z.infer<ReturnType<typeof tutorReplySchema<TargetLanguage>>>;
 
-export const createConversationRequest = z.object({
-  targetLanguage: TargetLanguage,
-  level: Level,
-});
+export const createConversationRequest = z
+  .object({
+    appLanguage: AppLanguage,
+    targetLanguage: TargetLanguage,
+    level: Level,
+  })
+  .refine((request) => request.targetLanguage !== request.appLanguage, {
+    message: 'Target language must differ from the App language',
+    path: ['targetLanguage'],
+  });
 
 export const sendMessageRequest = z.object({
   content: z.string().trim().min(1),

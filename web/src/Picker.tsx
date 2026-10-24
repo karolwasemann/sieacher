@@ -36,7 +36,8 @@ export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => v
     if (!targetLanguage || !level) return;
     setStatus('starting');
     try {
-      onStart(await createConversation({ targetLanguage, level }));
+      // shortcut: always Polish, until the App language screen in M2 step 4.
+      onStart(await createConversation({ appLanguage: 'pl', targetLanguage, level }));
     } catch (error) {
       console.error(error);
       setStatus('failed');

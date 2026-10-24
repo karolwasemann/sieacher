@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { tutorReplySchema } from './index.ts';
+import { createConversationRequest, tutorReplySchema } from './index.ts';
 
 const tutorReplyWith = (category: string) => ({
   reply: 'Wie war dein Wochenende?',
@@ -24,5 +24,17 @@ describe('tutorReplySchema', () => {
 
   it('rejects a category from the other language', () => {
     expect(tutorReplySchema('de').safeParse(tutorReplyWith('articles')).success).toBe(false);
+  });
+});
+
+describe('createConversationRequest', () => {
+  it('accepts a Target language different from the App language', () => {
+    const request = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2' };
+    expect(createConversationRequest.safeParse(request).success).toBe(true);
+  });
+
+  it('rejects a Target language equal to the App language', () => {
+    const request = { appLanguage: 'de', targetLanguage: 'de', level: 'A2' };
+    expect(createConversationRequest.safeParse(request).success).toBe(false);
   });
 });

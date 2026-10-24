@@ -1,4 +1,4 @@
-import type { Level, TargetLanguage, TutorReply } from '@sieacher/shared';
+import type { AppLanguage, Level, TargetLanguage, TutorReply } from '@sieacher/shared';
 
 // What can go wrong when sending a Message. The first two are the server's 502 codes.
 export type ErrorCode =
@@ -17,7 +17,12 @@ export class ApiError extends Error {
   }
 }
 
-export type Conversation = { id: string; targetLanguage: TargetLanguage; level: Level };
+export type Conversation = {
+  id: string;
+  appLanguage: AppLanguage;
+  targetLanguage: TargetLanguage;
+  level: Level;
+};
 
 export const createConversation = async (settings: Omit<Conversation, 'id'>) => {
   const response = await fetch('/api/conversations', {

@@ -27,7 +27,11 @@ const setup = (responses: string[]) => {
       body: JSON.stringify(body),
     });
   const startConversation = async () => {
-    const response = await post('/api/conversations', { targetLanguage: 'de', level: 'A2' });
+    const response = await post('/api/conversations', {
+      appLanguage: 'pl',
+      targetLanguage: 'de',
+      level: 'A2',
+    });
     const { id } = (await response.json()) as { id: string };
     return id;
   };
@@ -38,7 +42,11 @@ describe('POST /api/conversations', () => {
   it('creates a Conversation', async () => {
     const { post, store } = setup([]);
 
-    const response = await post('/api/conversations', { targetLanguage: 'de', level: 'A2' });
+    const response = await post('/api/conversations', {
+      appLanguage: 'pl',
+      targetLanguage: 'de',
+      level: 'A2',
+    });
 
     expect(response.status).toBe(201);
     const { id } = (await response.json()) as { id: string };
@@ -48,7 +56,23 @@ describe('POST /api/conversations', () => {
   it('rejects an unknown Level', async () => {
     const { post } = setup([]);
 
-    const response = await post('/api/conversations', { targetLanguage: 'de', level: 'D1' });
+    const response = await post('/api/conversations', {
+      appLanguage: 'pl',
+      targetLanguage: 'de',
+      level: 'D1',
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects a Target language equal to the App language', async () => {
+    const { post } = setup([]);
+
+    const response = await post('/api/conversations', {
+      appLanguage: 'de',
+      targetLanguage: 'de',
+      level: 'A2',
+    });
 
     expect(response.status).toBe(400);
   });

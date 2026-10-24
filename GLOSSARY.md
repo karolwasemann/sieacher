@@ -4,7 +4,7 @@
 
 **Tutor** — the AI persona the Learner converses with, named Lulu. It speaks the Target language, adapts to the Learner's Level, and gives Corrections.
 
-**App language** — the language of the interface and of all explanations. Currently Polish.
+**App language** — the language of the interface and of all explanations. The Learner's own language, picked on the first screen: Polish, English or German.
 
 **Target language** — a language the Learner is learning. Currently English or German.
 
@@ -15,6 +15,8 @@
 **Topic** — what a Conversation is about. The Learner either types their own or picks one of a few suggested Topics.
 
 **Message** — one turn in a Conversation, written by either the Learner or the Tutor.
+
+**Opening** — the Tutor's first Message in a Conversation, about the Topic, written before the Learner says anything.
 
 **Correction** — the Tutor's fix of a mistake in a Learner's Message: the corrected form plus a short explanation in the App language. Corrections are shown alongside the Tutor's reply and never interrupt the Conversation. Every Correction is an occurrence of one Mistake.
 
