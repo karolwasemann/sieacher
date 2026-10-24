@@ -1,9 +1,15 @@
-import { MISTAKE_CATEGORIES, type Level, type TargetLanguage } from '@sieacher/shared';
+import {
+  MISTAKE_CATEGORIES,
+  type AppLanguage,
+  type Level,
+  type TargetLanguage,
+} from '@sieacher/shared';
 
 const LANGUAGE_NAMES = {
   en: 'English',
   de: 'German',
-} satisfies Record<TargetLanguage, string>;
+  pl: 'Polish',
+} satisfies Record<AppLanguage, string>;
 
 const LEVEL_GUIDANCE = {
   A1: 'Use very short sentences with one idea each, only the present tense, and the most common everyday words.',
@@ -15,16 +21,19 @@ const LEVEL_GUIDANCE = {
 } satisfies Record<Level, string>;
 
 export const buildSystemPrompt = ({
+  appLanguage,
   targetLanguage,
   level,
 }: {
+  appLanguage: AppLanguage;
   targetLanguage: TargetLanguage;
   level: Level;
 }) => {
   const language = LANGUAGE_NAMES[targetLanguage];
+  const appLanguageName = LANGUAGE_NAMES[appLanguage];
   const categories = MISTAKE_CATEGORIES[targetLanguage].join(', ');
 
-  return `You are Lulu, a warm and patient ${language} tutor. You are having a conversation with a Polish-speaking learner.
+  return `You are Lulu, a warm and patient ${language} tutor. You are having a conversation with a ${appLanguageName}-speaking learner.
 
 # Level
 The learner is at CEFR level ${level}. ${LEVEL_GUIDANCE[level]}
@@ -33,12 +42,12 @@ The learner is at CEFR level ${level}. ${LEVEL_GUIDANCE[level]}
 - Write "reply" in ${language}.
 - Keep replies short: 2–4 sentences.
 - End with a question that keeps the conversation going.
-- If the learner asks for help in Polish, answer briefly in Polish, then continue in ${language}.
+- If the learner asks for help in ${appLanguageName}, answer briefly in ${appLanguageName}, then continue in ${language}.
 
 # Corrections
 - Check only the learner's last message.
 - Correct only real mistakes, not style preferences.
-- Explain each correction in one short sentence in Polish.
+- Explain each correction in one short sentence in ${appLanguageName}.
 - Never mention corrections in your reply; they are shown separately.
 - If there are no mistakes, return an empty list. Never add a correction to say a sentence is correct.
 
@@ -47,6 +56,6 @@ Respond with JSON only, no markdown fences and no text around it:
 {"reply": "...", "corrections": [{"original": "...", "corrected": "...", "explanation": "...", "category": "..."}]}
 - "original": the wrong fragment, exactly as the learner wrote it.
 - "corrected": the fixed fragment.
-- "explanation": always in Polish, even though "reply" is in ${language}.
+- "explanation": always in ${appLanguageName}, even though "reply" is in ${language}.
 - "category": one of: ${categories}.`;
 };

@@ -1,16 +1,21 @@
-import type { Level, TargetLanguage, TutorReply } from '@sieacher/shared';
+import type { AppLanguage, Level, TargetLanguage, TutorReply } from '@sieacher/shared';
 
 export type Turn = { learnerMessage: string; tutorReply: TutorReply };
 
 export type Conversation = {
   id: string;
+  appLanguage: AppLanguage;
   targetLanguage: TargetLanguage;
   level: Level;
   turns: Turn[];
 };
 
 export interface ConversationStore {
-  create(settings: { targetLanguage: TargetLanguage; level: Level }): Conversation;
+  create(settings: {
+    appLanguage: AppLanguage;
+    targetLanguage: TargetLanguage;
+    level: Level;
+  }): Conversation;
   get(id: string): Conversation | undefined;
   addTurn(id: string, turn: Turn): void;
 }

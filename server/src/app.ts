@@ -27,6 +27,7 @@ export const createApp = ({ model, store }: { model: ChatModel; store: Conversat
       try {
         tutorReply = await getTutorReply({
           model,
+          appLanguage: conversation.appLanguage,
           targetLanguage: conversation.targetLanguage,
           level: conversation.level,
           messages: [...toModelMessages(conversation.turns), { role: 'user', content }],

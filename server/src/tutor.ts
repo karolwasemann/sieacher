@@ -1,5 +1,6 @@
 import {
   tutorReplySchema,
+  type AppLanguage,
   type Level,
   type TargetLanguage,
   type TutorReply,
@@ -33,16 +34,18 @@ const parseTutorReply = (
 
 export const getTutorReply = async ({
   model,
+  appLanguage,
   targetLanguage,
   level,
   messages,
 }: {
   model: ChatModel;
+  appLanguage: AppLanguage;
   targetLanguage: TargetLanguage;
   level: Level;
   messages: ChatMessage[];
 }): Promise<TutorReply> => {
-  const system = buildSystemPrompt({ targetLanguage, level });
+  const system = buildSystemPrompt({ appLanguage, targetLanguage, level });
 
   const answer = await model.complete(system, messages);
   const first = parseTutorReply(answer, targetLanguage);

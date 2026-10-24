@@ -18,7 +18,7 @@ const validReply = JSON.stringify({
 const messages: ChatMessage[] = [{ role: 'user', content: 'Ich war mit der Hund im Park.' }];
 
 const ask = (model: ChatModel) =>
-  getTutorReply({ model, targetLanguage: 'de', level: 'A2', messages });
+  getTutorReply({ model, appLanguage: 'pl', targetLanguage: 'de', level: 'A2', messages });
 
 describe('getTutorReply', () => {
   it('returns a valid reply after one call', async () => {
