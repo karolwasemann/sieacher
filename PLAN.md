@@ -74,7 +74,7 @@ The Learner first picks their App language (PL, EN or DE). All UI text, suggeste
 | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | 1    | `shared/`: `AppLanguage`; `appLanguage` in the create request; Target ≠ App language                                                          | done   |
 | 2    | `server/`: App language in Lulu's prompt (explanations, help rule) and in the store                                                           | done   |
-| 3    | `web/`: EN and DE translations of all UI strings; i18n follows the App language                                                               | todo   |
+| 3    | `web/`: EN and DE translations of all UI strings; i18n follows the App language                                                               | done   |
 | 4    | `web/`: App language screen before the Target language & Level picker                                                                         | todo   |
 | 5    | `shared/` + `server/`: `topic` in the create request, Topic in Lulu's prompt, kickoff Message, `opening` in the store and the create response | todo   |
 | 6    | `web/`: list of 20 Topics (EN/DE/PL) and a random pick of 5, with a test                                                                      | todo   |

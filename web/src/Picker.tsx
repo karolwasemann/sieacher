@@ -1,4 +1,4 @@
-import { Level, TargetLanguage } from '@sieacher/shared';
+import { AppLanguage, Level, TargetLanguage } from '@sieacher/shared';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createConversation, type Conversation } from './api.ts';
@@ -27,7 +27,7 @@ const Choice = ({
 );
 
 export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => void }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [targetLanguage, setTargetLanguage] = useState<TargetLanguage>();
   const [level, setLevel] = useState<Level>();
   const [status, setStatus] = useState<'idle' | 'starting' | 'failed'>('idle');
@@ -36,8 +36,9 @@ export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => v
     if (!targetLanguage || !level) return;
     setStatus('starting');
     try {
-      // shortcut: always Polish, until the App language screen in M2 step 4.
-      onStart(await createConversation({ appLanguage: 'pl', targetLanguage, level }));
+      // The App language is whatever i18n is showing, so UI and Lulu always agree.
+      const appLanguage = AppLanguage.parse(i18n.language);
+      onStart(await createConversation({ appLanguage, targetLanguage, level }));
     } catch (error) {
       console.error(error);
       setStatus('failed');

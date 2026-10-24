@@ -56,3 +56,6 @@ export const pl = {
     unexpected: 'Coś poszło nie tak. Spróbuj ponownie.',
   } satisfies Record<ErrorCode, string>,
 };
+
+// The shape every other App language must match, key for key.
+export type Translation = typeof pl;
