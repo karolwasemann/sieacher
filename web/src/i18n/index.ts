@@ -24,7 +24,7 @@ i18n.on('languageChanged', (language) => {
 });
 
 void i18n.use(initReactI18next).init({
-  // shortcut: always Polish, until the App language screen in M2 step 4.
+  // Replaced on the App language screen, before any translated text is shown.
   lng: 'pl',
   supportedLngs: AppLanguage.options,
   resources,

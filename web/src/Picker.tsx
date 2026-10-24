@@ -1,30 +1,8 @@
 import { AppLanguage, Level, TargetLanguage } from '@sieacher/shared';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createConversation, type Conversation } from './api.ts';
-
-const Choice = ({
-  selected,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) => (
-  <button
-    type="button"
-    aria-pressed={selected}
-    onClick={onClick}
-    className={`rounded-lg border px-4 py-2 text-left focus-visible:outline-2 focus-visible:outline-iris ${
-      selected
-        ? 'border-pine bg-overlay text-pine'
-        : 'border-highlight-med bg-surface hover:bg-highlight-low'
-    }`}
-  >
-    {children}
-  </button>
-);
+import { Choice } from './Choice.tsx';
 
 export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => void }) => {
   const { t, i18n } = useTranslation();
@@ -52,15 +30,17 @@ export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => v
       <section className="flex flex-col gap-3">
         <h2 className="font-medium text-subtle">{t('picker.targetLanguage')}</h2>
         <div className="grid grid-cols-2 gap-2">
-          {TargetLanguage.options.map((option) => (
-            <Choice
-              key={option}
-              selected={option === targetLanguage}
-              onClick={() => setTargetLanguage(option)}
-            >
-              {t(`targetLanguage.${option}`)}
-            </Choice>
-          ))}
+          {TargetLanguage.options
+            .filter((option) => option !== i18n.language)
+            .map((option) => (
+              <Choice
+                key={option}
+                selected={option === targetLanguage}
+                onClick={() => setTargetLanguage(option)}
+              >
+                {t(`targetLanguage.${option}`)}
+              </Choice>
+            ))}
         </div>
       </section>
 
