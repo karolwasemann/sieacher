@@ -22,6 +22,7 @@ export type Conversation = {
   appLanguage: AppLanguage;
   targetLanguage: TargetLanguage;
   level: Level;
+  topic: string;
 };
 
 export const createConversation = async (settings: Omit<Conversation, 'id'>) => {

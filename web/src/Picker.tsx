@@ -16,7 +16,9 @@ export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => v
     try {
       // The App language is whatever i18n is showing, so UI and Lulu always agree.
       const appLanguage = AppLanguage.parse(i18n.language);
-      onStart(await createConversation({ appLanguage, targetLanguage, level }));
+      // shortcut: a fixed Topic until the Topic screen
+      const topic = 'everyday life';
+      onStart(await createConversation({ appLanguage, targetLanguage, level, topic }));
     } catch (error) {
       console.error(error);
       setStatus('failed');

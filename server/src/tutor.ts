@@ -7,7 +7,7 @@ import {
 } from '@sieacher/shared';
 import { z } from 'zod';
 import type { ChatMessage, ChatModel } from './chat-model.ts';
-import { buildSystemPrompt } from './system-prompt.ts';
+import { buildSystemPrompt, KICKOFF_MESSAGE } from './system-prompt.ts';
 
 export class InvalidTutorReplyError extends Error {}
 
@@ -32,20 +32,20 @@ const parseTutorReply = (
   return { ok: true, reply: { ...result.data, corrections } };
 };
 
-export const getTutorReply = async ({
-  model,
-  appLanguage,
-  targetLanguage,
-  level,
-  messages,
-}: {
-  model: ChatModel;
+type Settings = {
   appLanguage: AppLanguage;
   targetLanguage: TargetLanguage;
   level: Level;
-  messages: ChatMessage[];
-}): Promise<TutorReply> => {
-  const system = buildSystemPrompt({ appLanguage, targetLanguage, level });
+  topic: string;
+};
+
+export const getTutorReply = async ({
+  model,
+  messages,
+  ...settings
+}: Settings & { model: ChatModel; messages: ChatMessage[] }): Promise<TutorReply> => {
+  const { targetLanguage } = settings;
+  const system = buildSystemPrompt(settings);
 
   const answer = await model.complete(system, messages);
   const first = parseTutorReply(answer, targetLanguage);
@@ -63,4 +63,13 @@ export const getTutorReply = async ({
   if (retry.ok) return retry.reply;
 
   throw new InvalidTutorReplyError(retry.error);
+};
+
+// Same call → parse → validate → retry flow; the kickoff has nothing to correct, so only the reply is kept.
+export const getOpening = async (settings: Settings & { model: ChatModel }) => {
+  const { reply } = await getTutorReply({
+    ...settings,
+    messages: [{ role: 'user', content: KICKOFF_MESSAGE }],
+  });
+  return reply;
 };

@@ -28,13 +28,28 @@ describe('tutorReplySchema', () => {
 });
 
 describe('createConversationRequest', () => {
+  const request = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2', topic: 'Urlaub' };
+
   it('accepts a Target language different from the App language', () => {
-    const request = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2' };
     expect(createConversationRequest.safeParse(request).success).toBe(true);
   });
 
   it('rejects a Target language equal to the App language', () => {
-    const request = { appLanguage: 'de', targetLanguage: 'de', level: 'A2' };
-    expect(createConversationRequest.safeParse(request).success).toBe(false);
+    expect(createConversationRequest.safeParse({ ...request, appLanguage: 'de' }).success).toBe(
+      false,
+    );
+  });
+
+  it('trims the Topic', () => {
+    expect(createConversationRequest.parse({ ...request, topic: '  Urlaub  ' }).topic).toBe(
+      'Urlaub',
+    );
+  });
+
+  it('rejects a blank or too long Topic', () => {
+    expect(createConversationRequest.safeParse({ ...request, topic: '   ' }).success).toBe(false);
+    expect(
+      createConversationRequest.safeParse({ ...request, topic: 'x'.repeat(121) }).success,
+    ).toBe(false);
   });
 });

@@ -7,15 +7,13 @@ export type Conversation = {
   appLanguage: AppLanguage;
   targetLanguage: TargetLanguage;
   level: Level;
+  topic: string;
+  opening: string; // Lulu's Opening, written before the first Turn
   turns: Turn[];
 };
 
 export interface ConversationStore {
-  create(settings: {
-    appLanguage: AppLanguage;
-    targetLanguage: TargetLanguage;
-    level: Level;
-  }): Conversation;
+  create(settings: Omit<Conversation, 'id' | 'turns'>): Conversation;
   get(id: string): Conversation | undefined;
   addTurn(id: string, turn: Turn): void;
 }

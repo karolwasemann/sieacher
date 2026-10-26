@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
 import type { ChatMessage, ChatModel } from './chat-model.ts';
 import { createFakeModel } from './fake-model.ts';
-import { getTutorReply, InvalidTutorReplyError } from './tutor.ts';
+import { KICKOFF_MESSAGE } from './system-prompt.ts';
+import { getOpening, getTutorReply, InvalidTutorReplyError } from './tutor.ts';
 
 const validReply = JSON.stringify({
   reply: 'Wie war dein Wochenende?',
@@ -17,8 +18,9 @@ const validReply = JSON.stringify({
 
 const messages: ChatMessage[] = [{ role: 'user', content: 'Ich war mit der Hund im Park.' }];
 
-const ask = (model: ChatModel) =>
-  getTutorReply({ model, appLanguage: 'pl', targetLanguage: 'de', level: 'A2', messages });
+const settings = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2', topic: 'Urlaub' } as const;
+
+const ask = (model: ChatModel) => getTutorReply({ model, ...settings, messages });
 
 describe('getTutorReply', () => {
   it('returns a valid reply after one call', async () => {
@@ -70,5 +72,17 @@ describe('getTutorReply', () => {
 
     expect((await ask(model)).corrections).toEqual([]);
     expect(calls).toHaveLength(1);
+  });
+});
+
+describe('getOpening', () => {
+  it("sends only the kickoff Message and returns Lulu's reply", async () => {
+    const { model, calls } = createFakeModel([
+      JSON.stringify({ reply: 'Hallo! Wohin fährst du gern im Urlaub?', corrections: [] }),
+    ]);
+
+    expect(await getOpening({ model, ...settings })).toBe('Hallo! Wohin fährst du gern im Urlaub?');
+    expect(calls[0]?.messages).toEqual([{ role: 'user', content: KICKOFF_MESSAGE }]);
+    expect(calls[0]?.system).toContain('<topic>Urlaub</topic>');
   });
 });

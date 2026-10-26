@@ -2,21 +2,39 @@ import { zValidator } from '@hono/zod-validator';
 import { createConversationRequest, sendMessageRequest, type TutorReply } from '@sieacher/shared';
 import { Hono } from 'hono';
 import type { ChatMessage, ChatModel } from './chat-model.ts';
-import type { ConversationStore, Turn } from './conversation-store.ts';
-import { getTutorReply, InvalidTutorReplyError } from './tutor.ts';
+import type { Conversation, ConversationStore } from './conversation-store.ts';
+import { KICKOFF_MESSAGE } from './system-prompt.ts';
+import { getOpening, getTutorReply, InvalidTutorReplyError } from './tutor.ts';
 
 // Lulu's past turns go back as full JSON, so the history matches the format the prompt asks for.
-const toModelMessages = (turns: Turn[]): ChatMessage[] =>
-  turns.flatMap(({ learnerMessage, tutorReply }): ChatMessage[] => [
+// It starts with the kickoff and the Opening, so Lulu knows what she opened with.
+const toModelMessages = ({ opening, turns }: Conversation): ChatMessage[] => [
+  { role: 'user', content: KICKOFF_MESSAGE },
+  { role: 'assistant', content: JSON.stringify({ reply: opening, corrections: [] }) },
+  ...turns.flatMap(({ learnerMessage, tutorReply }): ChatMessage[] => [
     { role: 'user', content: learnerMessage },
     { role: 'assistant', content: JSON.stringify(tutorReply) },
-  ]);
+  ]),
+];
+
+const modelErrorCode = (error: unknown) =>
+  error instanceof InvalidTutorReplyError ? 'invalid-tutor-reply' : 'model-unavailable';
 
 export const createApp = ({ model, store }: { model: ChatModel; store: ConversationStore }) =>
   new Hono()
-    .post('/api/conversations', zValidator('json', createConversationRequest), (c) => {
-      const { id } = store.create(c.req.valid('json'));
-      return c.json({ id }, 201);
+    .post('/api/conversations', zValidator('json', createConversationRequest), async (c) => {
+      const settings = c.req.valid('json');
+      let opening: string;
+      try {
+        opening = await getOpening({ model, ...settings });
+      } catch (error) {
+        console.error(error);
+        return c.json({ error: modelErrorCode(error) }, 502);
+      }
+
+      // Created only after a valid Opening, so a failed start leaves nothing behind.
+      const { id } = store.create({ ...settings, opening });
+      return c.json({ id, opening }, 201);
     })
     .post('/api/conversations/:id/messages', zValidator('json', sendMessageRequest), async (c) => {
       const conversation = store.get(c.req.param('id'));
@@ -30,13 +48,12 @@ export const createApp = ({ model, store }: { model: ChatModel; store: Conversat
           appLanguage: conversation.appLanguage,
           targetLanguage: conversation.targetLanguage,
           level: conversation.level,
-          messages: [...toModelMessages(conversation.turns), { role: 'user', content }],
+          topic: conversation.topic,
+          messages: [...toModelMessages(conversation), { role: 'user', content }],
         });
       } catch (error) {
         console.error(error);
-        const code =
-          error instanceof InvalidTutorReplyError ? 'invalid-tutor-reply' : 'model-unavailable';
-        return c.json({ error: code }, 502);
+        return c.json({ error: modelErrorCode(error) }, 502);
       }
 
       // Saved only after a valid reply, so the Learner can resend without duplicating a Message.

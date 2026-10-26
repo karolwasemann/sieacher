@@ -52,6 +52,8 @@ export const createConversationRequest = z
     appLanguage: AppLanguage,
     targetLanguage: TargetLanguage,
     level: Level,
+    // Typed by the Learner and put into Lulu's prompt, so it is capped.
+    topic: z.string().trim().min(1).max(120),
   })
   .refine((request) => request.targetLanguage !== request.appLanguage, {
     message: 'Target language must differ from the App language',

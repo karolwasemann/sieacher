@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 import { createApp } from './app.ts';
 import { createInMemoryStore } from './conversation-store.ts';
 import { createFakeModel } from './fake-model.ts';
+import { KICKOFF_MESSAGE } from './system-prompt.ts';
 
 const tutorReply = {
   reply: 'Wie war dein Wochenende?',
@@ -15,6 +16,8 @@ const tutorReply = {
   ],
 };
 const validReply = JSON.stringify(tutorReply);
+const openingReply = JSON.stringify({ reply: 'Hallo! Wohin fährst du gern?', corrections: [] });
+const request = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2', topic: 'Urlaub' };
 
 const setup = (responses: string[]) => {
   const fake = createFakeModel(responses);
@@ -26,12 +29,9 @@ const setup = (responses: string[]) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+  // Uses up the first fake response for the Opening.
   const startConversation = async () => {
-    const response = await post('/api/conversations', {
-      appLanguage: 'pl',
-      targetLanguage: 'de',
-      level: 'A2',
-    });
+    const response = await post('/api/conversations', request);
     const { id } = (await response.json()) as { id: string };
     return id;
   };
@@ -39,28 +39,41 @@ const setup = (responses: string[]) => {
 };
 
 describe('POST /api/conversations', () => {
-  it('creates a Conversation', async () => {
-    const { post, store } = setup([]);
+  it("creates a Conversation with Lulu's Opening", async () => {
+    const { post, store } = setup([openingReply]);
 
-    const response = await post('/api/conversations', {
-      appLanguage: 'pl',
-      targetLanguage: 'de',
-      level: 'A2',
-    });
+    const response = await post('/api/conversations', request);
 
     expect(response.status).toBe(201);
-    const { id } = (await response.json()) as { id: string };
-    expect(store.get(id)).toMatchObject({ targetLanguage: 'de', level: 'A2', turns: [] });
+    const { id, opening } = (await response.json()) as { id: string; opening: string };
+    expect(opening).toBe('Hallo! Wohin fährst du gern?');
+    expect(store.get(id)).toMatchObject({ ...request, opening, turns: [] });
+  });
+
+  it('returns 502 and creates nothing when the Opening fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { post, store } = setup(['not json', 'still not json']);
+    const create = vi.spyOn(store, 'create');
+
+    const response = await post('/api/conversations', request);
+
+    expect(response.status).toBe(502);
+    expect(await response.json()).toEqual({ error: 'invalid-tutor-reply' });
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a missing Topic', async () => {
+    const { post } = setup([]);
+
+    const response = await post('/api/conversations', { ...request, topic: undefined });
+
+    expect(response.status).toBe(400);
   });
 
   it('rejects an unknown Level', async () => {
     const { post } = setup([]);
 
-    const response = await post('/api/conversations', {
-      appLanguage: 'pl',
-      targetLanguage: 'de',
-      level: 'D1',
-    });
+    const response = await post('/api/conversations', { ...request, level: 'D1' });
 
     expect(response.status).toBe(400);
   });
@@ -68,19 +81,15 @@ describe('POST /api/conversations', () => {
   it('rejects a Target language equal to the App language', async () => {
     const { post } = setup([]);
 
-    const response = await post('/api/conversations', {
-      appLanguage: 'de',
-      targetLanguage: 'de',
-      level: 'A2',
-    });
+    const response = await post('/api/conversations', { ...request, appLanguage: 'de' });
 
     expect(response.status).toBe(400);
   });
 });
 
 describe('POST /api/conversations/:id/messages', () => {
-  it("returns Lulu's reply and sends the earlier turns to the model", async () => {
-    const { post, calls, startConversation } = setup([validReply, validReply]);
+  it("returns Lulu's reply and sends the Opening and earlier turns to the model", async () => {
+    const { post, calls, startConversation } = setup([openingReply, validReply, validReply]);
     const id = await startConversation();
 
     const first = await post(`/api/conversations/${id}/messages`, { content: 'Hallo!' });
@@ -88,7 +97,9 @@ describe('POST /api/conversations/:id/messages', () => {
 
     expect(first.status).toBe(200);
     expect(await first.json()).toEqual(tutorReply);
-    expect(calls[1]?.messages).toEqual([
+    expect(calls[2]?.messages).toEqual([
+      { role: 'user', content: KICKOFF_MESSAGE },
+      { role: 'assistant', content: openingReply },
       { role: 'user', content: 'Hallo!' },
       { role: 'assistant', content: validReply },
       { role: 'user', content: 'Ich war mit der Hund im Park.' },
@@ -104,7 +115,7 @@ describe('POST /api/conversations/:id/messages', () => {
   });
 
   it('rejects an empty Message', async () => {
-    const { post, startConversation } = setup([]);
+    const { post, startConversation } = setup([openingReply]);
     const id = await startConversation();
 
     const response = await post(`/api/conversations/${id}/messages`, { content: '   ' });
@@ -114,7 +125,7 @@ describe('POST /api/conversations/:id/messages', () => {
 
   it('returns 502 after two invalid answers and saves nothing', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { post, store, startConversation } = setup(['not json', 'still not json']);
+    const { post, store, startConversation } = setup([openingReply, 'not json', 'still not json']);
     const id = await startConversation();
 
     const response = await post(`/api/conversations/${id}/messages`, { content: 'Hallo!' });
