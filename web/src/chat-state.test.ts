@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { chatReducer, initialChatState, type ChatState } from './chat-state.ts';
+import { chatReducer, createInitialChatState, type ChatState } from './chat-state.ts';
 
 const correction = {
   original: 'mit der Hund',
@@ -14,15 +14,21 @@ const sending: ChatState = {
 };
 
 describe('chatReducer', () => {
-  it('starts empty and idle', () => {
-    expect(initialChatState).toEqual({ messages: [], status: 'idle' });
+  it("starts with Lulu's Opening, idle", () => {
+    expect(createInitialChatState('Hallo! Was machst du gern im Urlaub?')).toEqual({
+      messages: [{ role: 'tutor', reply: 'Hallo! Was machst du gern im Urlaub?' }],
+      status: 'idle',
+    });
   });
 
   it('shows a sent Message right away and waits for Lulu', () => {
-    const state = chatReducer(initialChatState, { type: 'sent', content: 'Hallo!' });
+    const state = chatReducer(createInitialChatState('Hallo!'), { type: 'sent', content: 'Hi!' });
 
     expect(state).toEqual({
-      messages: [{ role: 'learner', content: 'Hallo!' }],
+      messages: [
+        { role: 'tutor', reply: 'Hallo!' },
+        { role: 'learner', content: 'Hi!' },
+      ],
       status: 'sending',
     });
   });

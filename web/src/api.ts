@@ -23,9 +23,10 @@ export type Conversation = {
   targetLanguage: TargetLanguage;
   level: Level;
   topic: string;
+  opening: string;
 };
 
-export const createConversation = async (settings: Omit<Conversation, 'id'>) => {
+export const createConversation = async (settings: Omit<Conversation, 'id' | 'opening'>) => {
   const response = await fetch('/api/conversations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -33,8 +34,8 @@ export const createConversation = async (settings: Omit<Conversation, 'id'>) => 
   });
   if (!response.ok) throw new Error(`POST /api/conversations failed: ${response.status}`);
 
-  const { id } = (await response.json()) as { id: string };
-  return { id, ...settings };
+  const { id, opening } = (await response.json()) as { id: string; opening: string };
+  return { id, opening, ...settings };
 };
 
 export const sendMessage = async (conversationId: string, content: string) => {

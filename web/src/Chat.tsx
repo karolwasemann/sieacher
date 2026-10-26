@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApiError, sendMessage, type Conversation } from './api.ts';
-import { chatReducer, initialChatState } from './chat-state.ts';
+import { chatReducer, createInitialChatState } from './chat-state.ts';
 import { CorrectionCard } from './CorrectionCard.tsx';
 
 export const Chat = ({
@@ -12,7 +12,7 @@ export const Chat = ({
   onEnd: () => void;
 }) => {
   const { t } = useTranslation();
-  const [state, dispatch] = useReducer(chatReducer, initialChatState);
+  const [state, dispatch] = useReducer(chatReducer, conversation.opening, createInitialChatState);
   const [draft, setDraft] = useState('');
   const listRef = useRef<HTMLOListElement>(null);
 
@@ -51,11 +51,16 @@ export const Chat = ({
 
   return (
     <div className="mx-auto flex h-dvh max-w-2xl flex-col">
-      <header className="flex items-center justify-between border-b border-highlight-med px-4 py-3">
-        <span className="font-medium">
-          {t(`targetLanguage.${conversation.targetLanguage}`)} · {conversation.level}
-        </span>
-        <button type="button" onClick={onEnd} className="text-pine hover:underline">
+      <header className="flex items-center justify-between gap-4 border-b border-highlight-med px-4 py-3">
+        <div className="flex min-w-0 flex-col">
+          <h1 className="truncate font-medium" title={conversation.topic}>
+            {conversation.topic}
+          </h1>
+          <span className="text-sm text-subtle">
+            {t(`targetLanguage.${conversation.targetLanguage}`)} · {conversation.level}
+          </span>
+        </div>
+        <button type="button" onClick={onEnd} className="shrink-0 text-pine hover:underline">
           {t('chat.newConversation')}
         </button>
       </header>

@@ -80,9 +80,9 @@ The Learner first picks their App language (PL, EN or DE). All UI text, suggeste
 | 3    | `web/`: EN and DE translations of all UI strings; i18n follows the App language                                                               | done   |
 | 4    | `web/`: App language screen before the Target language & Level picker                                                                         | done   |
 | 5    | `shared/` + `server/`: `topic` in the create request, Topic in Lulu's prompt, kickoff Message, `opening` in the store and the create response | done   |
-| 6    | `web/`: list of 20 Topics (EN/DE/PL) and a random pick of 5, with a test                                                                      | todo   |
-| 7    | `web/`: Topic screen in the App language — 5 suggestions, own Topic, Suggest others, loading/error                                            | todo   |
-| 8    | `web/`: chat shows the Topic and Lulu's Opening                                                                                               | todo   |
+| 6    | `web/`: list of 20 Topics (EN/DE/PL) and a random pick of 5, with a test                                                                      | done   |
+| 7    | `web/`: Topic screen in the App language — 5 suggestions, own Topic, Suggest others, loading/error                                            | done   |
+| 8    | `web/`: chat shows the Topic and Lulu's Opening                                                                                               | done   |
 | 9    | Try it end to end in all three App languages, look at the Opening's token usage                                                               | todo   |
 
 ### M3 — persistence

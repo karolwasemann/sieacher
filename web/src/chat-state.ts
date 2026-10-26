@@ -19,7 +19,10 @@ export type ChatAction =
   | { type: 'failed'; error: ErrorCode } // sending failed; the Learner Message stays
   | { type: 'resent' }; // the Learner retries the last Message after a failure
 
-export const initialChatState: ChatState = { messages: [], status: 'idle' };
+export const createInitialChatState = (opening: string): ChatState => ({
+  messages: [{ role: 'tutor', reply: opening }],
+  status: 'idle',
+});
 
 export const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
