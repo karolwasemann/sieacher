@@ -5,6 +5,13 @@ export const de: Translation = {
     title: 'Sprich mit Lulu',
     targetLanguage: 'Sprache',
     level: 'Niveau',
+    next: 'Weiter',
+  },
+  topic: {
+    title: 'Worüber möchtest du sprechen?',
+    suggestions: 'Vorschläge',
+    suggestOthers: 'Andere vorschlagen',
+    own: 'Dein Thema',
     start: 'Gespräch beginnen',
     starting: 'Wird gestartet…',
     failed: 'Das Gespräch konnte nicht beginnen. Läuft der Server?',

@@ -1,29 +1,15 @@
-import { AppLanguage, Level, TargetLanguage } from '@sieacher/shared';
+import { Level, TargetLanguage } from '@sieacher/shared';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createConversation, type Conversation } from './api.ts';
+import type { Conversation } from './api.ts';
 import { Choice } from './Choice.tsx';
 
-export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => void }) => {
+export type ConversationSettings = Pick<Conversation, 'targetLanguage' | 'level'>;
+
+export const Picker = ({ onNext }: { onNext: (settings: ConversationSettings) => void }) => {
   const { t, i18n } = useTranslation();
   const [targetLanguage, setTargetLanguage] = useState<TargetLanguage>();
   const [level, setLevel] = useState<Level>();
-  const [status, setStatus] = useState<'idle' | 'starting' | 'failed'>('idle');
-
-  const start = async () => {
-    if (!targetLanguage || !level) return;
-    setStatus('starting');
-    try {
-      // The App language is whatever i18n is showing, so UI and Lulu always agree.
-      const appLanguage = AppLanguage.parse(i18n.language);
-      // shortcut: a fixed Topic until the Topic screen
-      const topic = 'everyday life';
-      onStart(await createConversation({ appLanguage, targetLanguage, level, topic }));
-    } catch (error) {
-      console.error(error);
-      setStatus('failed');
-    }
-  };
 
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-8 p-6">
@@ -59,13 +45,12 @@ export const Picker = ({ onStart }: { onStart: (conversation: Conversation) => v
 
       <button
         type="button"
-        disabled={!targetLanguage || !level || status === 'starting'}
-        onClick={start}
+        disabled={!targetLanguage || !level}
+        onClick={() => targetLanguage && level && onNext({ targetLanguage, level })}
         className="rounded-lg bg-pine px-4 py-3 font-medium text-surface hover:bg-foam focus-visible:outline-2 focus-visible:outline-iris disabled:bg-highlight-high disabled:text-muted"
       >
-        {status === 'starting' ? t('picker.starting') : t('picker.start')}
+        {t('picker.next')}
       </button>
-      {status === 'failed' && <p className="text-love">{t('picker.failed')}</p>}
     </main>
   );
 };

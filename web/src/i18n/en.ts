@@ -5,6 +5,13 @@ export const en: Translation = {
     title: 'Talk with Lulu',
     targetLanguage: 'Language',
     level: 'Level',
+    next: 'Next',
+  },
+  topic: {
+    title: 'What do you want to talk about?',
+    suggestions: 'Suggestions',
+    suggestOthers: 'Suggest others',
+    own: 'Your topic',
     start: 'Start the conversation',
     starting: 'Starting…',
     failed: "Couldn't start the conversation. Is the server running?",

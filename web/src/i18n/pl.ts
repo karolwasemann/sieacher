@@ -8,6 +8,13 @@ export const pl = {
     title: 'Porozmawiaj z Lulu',
     targetLanguage: 'Język',
     level: 'Poziom',
+    next: 'Dalej',
+  },
+  topic: {
+    title: 'O czym chcesz porozmawiać?',
+    suggestions: 'Propozycje',
+    suggestOthers: 'Zaproponuj inne',
+    own: 'Twój temat',
     start: 'Zacznij rozmowę',
     starting: 'Zaczynam…',
     failed: 'Nie udało się zacząć rozmowy. Czy serwer działa?',
