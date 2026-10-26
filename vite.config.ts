@@ -12,5 +12,6 @@ export default defineConfig({
   fmt: {
     singleQuote: true,
     semi: true,
+    ignorePatterns: ['server/drizzle/**'],
   },
 });

@@ -122,8 +122,8 @@ The Opening is just the first `tutor` Message. A Correction belongs to the Learn
 | Step | What                                                                                                                                                             | Status |
 | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | 0    | Install Docker Engine in WSL; `compose.yaml` with Postgres 17 (data in a volume, port only on `127.0.0.1`)                                                       | done   |
-| 1    | `server/`: `ConversationStore` becomes async and stores a flat list of Messages; update the in-memory store and routes; tests stay green, no database yet        | todo   |
-| 2    | `server/`: Drizzle schema for the 3 tables, drizzle-kit config, first migration generated and read together                                                      | todo   |
+| 1    | `server/`: `ConversationStore` becomes async and stores a flat list of Messages; update the in-memory store and routes; tests stay green, no database yet        | done   |
+| 2    | `server/`: Drizzle schema for the 3 tables, drizzle-kit config, first migration generated and read together                                                      | done   |
 | 3    | `server/`: Postgres `ConversationStore` (writes in a transaction), tested against PGlite                                                                         | todo   |
 | 4    | `server/`: `DATABASE_URL` in `.env.example` and config, run migrations on startup; `index.ts` and route tests use the Postgres store; delete the in-memory store | todo   |
 | 5    | `shared/` + `server/`: `GET /api/conversations` (the list) and `GET /api/conversations/:id` (Messages + Corrections); `:id` checked as a uuid                    | todo   |
