@@ -6,15 +6,17 @@ import type { Conversation, ConversationStore } from './conversation-store.ts';
 import { KICKOFF_MESSAGE } from './system-prompt.ts';
 import { getOpening, getTutorReply, InvalidTutorReplyError } from './tutor.ts';
 
-// Lulu's past turns go back as full JSON, so the history matches the format the prompt asks for.
-// It starts with the kickoff and the Opening, so Lulu knows what she opened with.
-const toModelMessages = ({ opening, turns }: Conversation): ChatMessage[] => [
+// Lulu's past replies go back as full JSON, so the history matches the format the prompt asks for.
+// A reply's Corrections are stored on the Learner's Message before it, so they are put back together here.
+// It starts with the kickoff, so Lulu knows what she opened with.
+const toModelMessages = ({ messages }: Conversation): ChatMessage[] => [
   { role: 'user', content: KICKOFF_MESSAGE },
-  { role: 'assistant', content: JSON.stringify({ reply: opening, corrections: [] }) },
-  ...turns.flatMap(({ learnerMessage, tutorReply }): ChatMessage[] => [
-    { role: 'user', content: learnerMessage },
-    { role: 'assistant', content: JSON.stringify(tutorReply) },
-  ]),
+  ...messages.map((message, i): ChatMessage => {
+    if (message.role === 'learner') return { role: 'user', content: message.content };
+    const before = messages[i - 1];
+    const corrections = before?.role === 'learner' ? before.corrections : [];
+    return { role: 'assistant', content: JSON.stringify({ reply: message.content, corrections }) };
+  }),
 ];
 
 const modelErrorCode = (error: unknown) =>
@@ -33,11 +35,11 @@ export const createApp = ({ model, store }: { model: ChatModel; store: Conversat
       }
 
       // Created only after a valid Opening, so a failed start leaves nothing behind.
-      const { id } = store.create({ ...settings, opening });
+      const { id } = await store.create({ ...settings, opening });
       return c.json({ id, opening }, 201);
     })
     .post('/api/conversations/:id/messages', zValidator('json', sendMessageRequest), async (c) => {
-      const conversation = store.get(c.req.param('id'));
+      const conversation = await store.get(c.req.param('id'));
       if (!conversation) return c.json({ error: 'conversation-not-found' }, 404);
 
       const { content } = c.req.valid('json');
@@ -57,6 +59,6 @@ export const createApp = ({ model, store }: { model: ChatModel; store: Conversat
       }
 
       // Saved only after a valid reply, so the Learner can resend without duplicating a Message.
-      store.addTurn(conversation.id, { learnerMessage: content, tutorReply });
+      await store.addTurn(conversation.id, { learnerMessage: content, tutorReply });
       return c.json(tutorReply);
     });

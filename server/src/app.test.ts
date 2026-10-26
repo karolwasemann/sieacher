@@ -47,7 +47,10 @@ describe('POST /api/conversations', () => {
     expect(response.status).toBe(201);
     const { id, opening } = (await response.json()) as { id: string; opening: string };
     expect(opening).toBe('Hallo! Wohin fährst du gern?');
-    expect(store.get(id)).toMatchObject({ ...request, opening, turns: [] });
+    expect(await store.get(id)).toMatchObject({
+      ...request,
+      messages: [{ role: 'tutor', content: opening }],
+    });
   });
 
   it('returns 502 and creates nothing when the Opening fails', async () => {
@@ -132,6 +135,6 @@ describe('POST /api/conversations/:id/messages', () => {
 
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({ error: 'invalid-tutor-reply' });
-    expect(store.get(id)?.turns).toEqual([]);
+    expect((await store.get(id))?.messages).toHaveLength(1); // only the Opening
   });
 });
