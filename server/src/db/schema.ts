@@ -1,4 +1,4 @@
-import type { AppLanguage, Level, TargetLanguage } from '@sieacher/shared';
+import type { AppLanguage, Level, TargetLanguage, TutorReply } from '@sieacher/shared';
 import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 // Values are plain text, not Postgres enums: zod checks them at the API, and enums are hard to change.
@@ -31,5 +31,5 @@ export const corrections = pgTable('corrections', {
   original: text().notNull(),
   corrected: text().notNull(),
   explanation: text().notNull(),
-  category: text().notNull(),
+  category: text().$type<TutorReply['corrections'][number]['category']>().notNull(),
 });

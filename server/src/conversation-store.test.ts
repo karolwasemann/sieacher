@@ -1,5 +1,10 @@
-import { describe, expect, it } from 'vite-plus/test';
-import { createInMemoryStore } from './conversation-store.ts';
+import { PGlite } from '@electric-sql/pglite';
+import { sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/pglite';
+import { migrate } from 'drizzle-orm/pglite/migrator';
+import { beforeAll, describe, expect, it } from 'vite-plus/test';
+import { type ConversationStore, createInMemoryStore } from './conversation-store.ts';
+import { createPostgresStore } from './postgres-store.ts';
 
 const settings = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2', topic: 'Urlaub' } as const;
 const correction = {
@@ -9,9 +14,24 @@ const correction = {
   category: 'case',
 } as const;
 
-describe('in-memory ConversationStore', () => {
+// PGlite takes seconds to start, so one in-memory Postgres serves the whole file:
+// shaped once by the committed migrations, emptied before each test.
+const db = drizzle(new PGlite(), { casing: 'snake_case' });
+beforeAll(async () => {
+  await migrate(db, { migrationsFolder: new URL('../drizzle', import.meta.url).pathname });
+}, 30_000);
+
+const createTestPostgresStore = async () => {
+  await db.execute(sql`truncate conversations, messages, corrections restart identity`);
+  return createPostgresStore(db);
+};
+
+describe.each<[string, () => Promise<ConversationStore> | ConversationStore]>([
+  ['in-memory', createInMemoryStore],
+  ['Postgres', createTestPostgresStore],
+])('%s ConversationStore', (_name, createStore) => {
   it('creates a Conversation whose first Message is the Opening', async () => {
-    const store = createInMemoryStore();
+    const store = await createStore();
 
     const created = await store.create({ ...settings, opening: 'Hallo! Wohin fährst du gern?' });
 
@@ -23,7 +43,7 @@ describe('in-memory ConversationStore', () => {
   });
 
   it("adds a turn as two Messages, with the Corrections on the Learner's one", async () => {
-    const store = createInMemoryStore();
+    const store = await createStore();
     const { id } = await store.create({ ...settings, opening: 'Hallo!' });
 
     await store.addTurn(id, {
@@ -39,13 +59,14 @@ describe('in-memory ConversationStore', () => {
   });
 
   it('rejects a turn for an unknown Conversation', async () => {
-    const store = createInMemoryStore();
+    const store = await createStore();
+    const unknownId = crypto.randomUUID();
 
     await expect(
-      store.addTurn('nope', {
+      store.addTurn(unknownId, {
         learnerMessage: 'Hallo!',
         tutorReply: { reply: 'Hi', corrections: [] },
       }),
-    ).rejects.toThrow('Unknown Conversation nope');
+    ).rejects.toThrow(`Unknown Conversation ${unknownId}`);
   });
 });
