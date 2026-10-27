@@ -24,30 +24,3 @@ export interface ConversationStore {
   get(id: string): Promise<Conversation | undefined>;
   addTurn(id: string, turn: Turn): Promise<void>;
 }
-
-export const createInMemoryStore = (): ConversationStore => {
-  const conversations = new Map<string, Conversation>();
-
-  return {
-    async create({ opening, ...settings }) {
-      const conversation: Conversation = {
-        id: crypto.randomUUID(),
-        ...settings,
-        messages: [{ role: 'tutor', content: opening }],
-      };
-      conversations.set(conversation.id, conversation);
-      return conversation;
-    },
-    async get(id) {
-      return conversations.get(id);
-    },
-    async addTurn(id, { learnerMessage, tutorReply }) {
-      const conversation = conversations.get(id);
-      if (!conversation) throw new Error(`Unknown Conversation ${id}`);
-      conversation.messages.push(
-        { role: 'learner', content: learnerMessage, corrections: tutorReply.corrections },
-        { role: 'tutor', content: tutorReply.reply },
-      );
-    },
-  };
-};

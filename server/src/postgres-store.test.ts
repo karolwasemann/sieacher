@@ -1,9 +1,5 @@
-import { PGlite } from '@electric-sql/pglite';
-import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
-import { migrate } from 'drizzle-orm/pglite/migrator';
-import { beforeAll, describe, expect, it } from 'vite-plus/test';
-import { type ConversationStore, createInMemoryStore } from './conversation-store.ts';
+import { describe, expect, it } from 'vite-plus/test';
+import { useTestDb } from './db/test-db.ts';
 import { createPostgresStore } from './postgres-store.ts';
 
 const settings = { appLanguage: 'pl', targetLanguage: 'de', level: 'A2', topic: 'Urlaub' } as const;
@@ -14,22 +10,10 @@ const correction = {
   category: 'case',
 } as const;
 
-// PGlite takes seconds to start, so one in-memory Postgres serves the whole file:
-// shaped once by the committed migrations, emptied before each test.
-const db = drizzle(new PGlite(), { casing: 'snake_case' });
-beforeAll(async () => {
-  await migrate(db, { migrationsFolder: new URL('../drizzle', import.meta.url).pathname });
-}, 30_000);
+const resetTestDb = useTestDb();
+const createStore = async () => createPostgresStore(await resetTestDb());
 
-const createTestPostgresStore = async () => {
-  await db.execute(sql`truncate conversations, messages, corrections restart identity`);
-  return createPostgresStore(db);
-};
-
-describe.each<[string, () => Promise<ConversationStore> | ConversationStore]>([
-  ['in-memory', createInMemoryStore],
-  ['Postgres', createTestPostgresStore],
-])('%s ConversationStore', (_name, createStore) => {
+describe('Postgres ConversationStore', () => {
   it('creates a Conversation whose first Message is the Opening', async () => {
     const store = await createStore();
 
