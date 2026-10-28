@@ -125,8 +125,8 @@ The Opening is just the first `tutor` Message. A Correction belongs to the Learn
 | 1    | `server/`: `ConversationStore` becomes async and stores a flat list of Messages; update the in-memory store and routes; tests stay green, no database yet        | done   |
 | 2    | `server/`: Drizzle schema for the 3 tables, drizzle-kit config, first migration generated and read together                                                      | done   |
 | 3    | `server/`: Postgres `ConversationStore` (writes in a transaction), tested against PGlite                                                                         | done   |
-| 4    | `server/`: `DATABASE_URL` in `.env.example` and config, run migrations on startup; `index.ts` and route tests use the Postgres store; delete the in-memory store | todo   |
-| 5    | `shared/` + `server/`: `GET /api/conversations` (the list) and `GET /api/conversations/:id` (Messages + Corrections); `:id` checked as a uuid                    | todo   |
+| 4    | `server/`: `DATABASE_URL` in `.env.example` and config, run migrations on startup; `index.ts` and route tests use the Postgres store; delete the in-memory store | done   |
+| 5    | `shared/` + `server/`: `GET /api/conversations` (the list) and `GET /api/conversations/:id` (Messages + Corrections); `:id` checked as a uuid                    | done   |
 | 6    | `web/`: Home screen after the App language screen: "New Conversation" button and the list of past Conversations                                                  | todo   |
 | 7    | `web/`: resume: the chat loads its history and continues at the original Level, in the Conversation's App language                                               | todo   |
 | 8    | `web/`: remember the App language in `localStorage`                                                                                                              | todo   |

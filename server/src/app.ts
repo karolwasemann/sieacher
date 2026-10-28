@@ -30,6 +30,12 @@ const modelErrorCode = (error: unknown) =>
 
 export const createApp = ({ model, store }: { model: ChatModel; store: ConversationStore }) =>
   new Hono()
+    .get('/api/conversations', async (c) => c.json(await store.list()))
+    .get('/api/conversations/:id', conversationIdParam, async (c) => {
+      const conversation = await store.get(c.req.valid('param').id);
+      if (!conversation) return c.json({ error: 'conversation-not-found' }, 404);
+      return c.json(conversation);
+    })
     .post('/api/conversations', zValidator('json', createConversationRequest), async (c) => {
       const settings = c.req.valid('json');
       let opening: string;

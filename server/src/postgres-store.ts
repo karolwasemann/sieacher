@@ -1,6 +1,7 @@
-import { asc, eq } from 'drizzle-orm';
+import { asc, desc, eq } from 'drizzle-orm';
 import type { PgDatabase, PgQueryResultHKT } from 'drizzle-orm/pg-core';
-import type { ConversationStore, Message } from './conversation-store.ts';
+import type { Message } from '@sieacher/shared';
+import type { ConversationStore } from './conversation-store.ts';
 import { conversations, corrections, messages } from './db/schema.ts';
 
 // Any Drizzle Postgres database: PGlite in tests, node-postgres in the app.
@@ -19,6 +20,21 @@ export const createPostgresStore = (db: Db): ConversationStore => ({
       await tx.insert(messages).values({ conversationId: id, role: 'tutor', content: opening });
       return { id, ...settings, messages: [{ role: 'tutor', content: opening }] };
     });
+  },
+
+  async list() {
+    const rows = await db
+      .select({
+        id: conversations.id,
+        appLanguage: conversations.appLanguage,
+        targetLanguage: conversations.targetLanguage,
+        level: conversations.level,
+        topic: conversations.topic,
+        createdAt: conversations.createdAt,
+      })
+      .from(conversations)
+      .orderBy(desc(conversations.createdAt), desc(conversations.id));
+    return rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() }));
   },
 
   async get(id) {

@@ -38,7 +38,8 @@ const setup = async (responses: string[]) => {
     const { id } = (await response.json()) as { id: string };
     return id;
   };
-  return { ...fake, store, post, startConversation };
+  const get = (path: string) => app.request(path);
+  return { ...fake, store, post, get, startConversation };
 };
 
 describe('POST /api/conversations', () => {
@@ -153,5 +154,67 @@ describe('POST /api/conversations/:id/messages', () => {
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({ error: 'invalid-tutor-reply' });
     expect((await store.get(id))?.messages).toHaveLength(1); // only the Opening
+  });
+});
+
+describe('GET /api/conversations', () => {
+  it('lists the started Conversations', async () => {
+    const { get, startConversation } = await setup([openingReply]);
+    const id = await startConversation();
+
+    const response = await get('/api/conversations');
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual([{ id, ...request, createdAt: expect.any(String) }]);
+  });
+
+  it('returns an empty list when there are none', async () => {
+    const { get } = await setup([]);
+
+    const response = await get('/api/conversations');
+
+    expect(await response.json()).toEqual([]);
+  });
+});
+
+describe('GET /api/conversations/:id', () => {
+  it('returns the Conversation with its Messages and Corrections', async () => {
+    const { post, get, startConversation } = await setup([openingReply, validReply]);
+    const id = await startConversation();
+    await post(`/api/conversations/${id}/messages`, { content: 'Ich war mit der Hund im Park.' });
+
+    const response = await get(`/api/conversations/${id}`);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      id,
+      ...request,
+      messages: [
+        { role: 'tutor', content: 'Hallo! Wohin fährst du gern?' },
+        {
+          role: 'learner',
+          content: 'Ich war mit der Hund im Park.',
+          corrections: tutorReply.corrections,
+        },
+        { role: 'tutor', content: tutorReply.reply },
+      ],
+    });
+  });
+
+  it('returns 404 for a broken id', async () => {
+    const { get } = await setup([]);
+
+    const response = await get('/api/conversations/abc');
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({ error: 'conversation-not-found' });
+  });
+
+  it('returns 404 for a well-formed id with no Conversation', async () => {
+    const { get } = await setup([]);
+
+    const response = await get(`/api/conversations/${crypto.randomUUID()}`);
+
+    expect(response.status).toBe(404);
   });
 });

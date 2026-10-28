@@ -53,4 +53,20 @@ describe('Postgres ConversationStore', () => {
       }),
     ).rejects.toThrow(`Unknown Conversation ${unknownId}`);
   });
+
+  it('lists Conversations newest first, without their Messages', async () => {
+    const store = await createStore();
+    const older = await store.create({ ...settings, opening: 'Hallo!' });
+    const newer = await store.create({ ...settings, topic: 'Kochen', opening: 'Hallo!' });
+
+    const list = await store.list();
+
+    expect(list.map((c) => c.id)).toEqual([newer.id, older.id]);
+    expect(list[0]).toEqual({
+      id: newer.id,
+      ...settings,
+      topic: 'Kochen',
+      createdAt: expect.any(String),
+    });
+  });
 });

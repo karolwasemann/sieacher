@@ -63,3 +63,22 @@ export const createConversationRequest = z
 export const sendMessageRequest = z.object({
   content: z.string().trim().min(1),
 });
+
+export type Correction = TutorReply['corrections'][number];
+
+export type Message =
+  | { role: 'learner'; content: string; corrections: Correction[] }
+  | { role: 'tutor'; content: string };
+
+type ConversationSettings = {
+  id: string;
+  appLanguage: AppLanguage;
+  targetLanguage: TargetLanguage;
+  level: Level;
+  topic: string;
+};
+
+
+export type ConversationSummary = ConversationSettings & { createdAt: string };
+
+export type ConversationDetail = ConversationSettings & { messages: Message[] };
