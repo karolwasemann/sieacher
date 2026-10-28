@@ -3,7 +3,7 @@
 **Practise a foreign language by chatting with Lulu, an AI tutor who talks to you at your level and quietly fixes your mistakes.**
 
 <p align="center">
-  <img src="docs/demo.gif" alt="Picking English as the app language, German at level A2 and a topic, then chatting with Lulu, who replies in German and shows Corrections explained in English" width="720">
+  <img src="assets/demo.gif" alt="Picking English as the app language, German at level A2 and a topic, then chatting with Lulu, who replies in German and shows Corrections explained in English" width="720">
 </p>
 
 ## What it does
